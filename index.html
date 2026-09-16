@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>화난 선생님 피하기!</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #222;
+            color: #fff;
+            font-family: 'Malgun Gothic', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            margin-bottom: 10px;
+            font-size: 24px;
+            color: #ffcc00;
+        }
+        #game-container {
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+        canvas {
+            background-color: #333;
+            border: 4px solid #fff;
+            border-radius: 8px;
+            display: block;
+        }
+        .ui-panel {
+            margin-top: 15px;
+            display: flex;
+            gap: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .controls-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>😡 화난 선생님을 피해서 숙제를 제출해라!</h1>
+    
+    <div id="game-container">
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+    </div>
+
+    <div class="ui-panel">
+        <div>점수: <span id="score">0</span>점</div>
+        <div>최고 점수: <span id="highScore">0</span>점</div>
+    </div>
+
+    <div class="controls-info">
+        방향키 (▲, ▼, ◀, ▶)로 학생을 조작하세요!
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const scoreEl = document.getElementById('score');
+        const highScoreEl = document.getElementById('highScore');
+
+        // 게임 상태
+        let score = 0;
+        let highScore = localStorage.getItem('teacherGame_highScore') || 0;
+        highScoreEl.innerText = highScore;
+
+        let gameOver = false;
+        let gameStart = false;
+
+        // 키 입력 상태
+        const keys = {};
+
+        window.addEventListener('keydown', e => {
+            keys[e.code] = true;
+            if ((e.code === 'Space' || e.code === 'KeyR') && gameOver) {
+                resetGame();
+            }
+            if (!gameStart) {
+                gameStart = true;
+            }
+        });
+
+        window.addEventListener('keyup', e => {
+            keys[e.code] = false;
+        });
+
+        // 플레이어 (학생)
+        const player = {
+            x: 50,
+            y: 200,
+            width: 30,
+            height: 30,
+            speed: 5,
+            color: '#4caf50', // 초록색
+            emoji: '🏃'
+        };
+
+        // 선생님 (숙제 내놓으라고 쫓아옴)
+        const teacher = {
+            x: 520,
+            y: 200,
+            width: 35,
+            height: 35,
+            speed: 2.2,
+            emoji: '😡'
+        };
+
+        // 숙제 (점수 아이템)
+        let homework = {
+            x: Math.random() * (canvas.width - 60) + 30,
+            y: Math.random() * (canvas.height - 60) + 30,
+            width: 25,
+            height: 25,
+            emoji: '📝'
+        };
+
+        // 날아오는 분필 (장애물)
+        let chalks = [];
+        let chalkTimer = 0;
+
+        function spawnChalk() {
+            const size = 15;
+            // 오른쪽 벽에서 무작위 Y위치로 분필 생성
+            chalks.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - size),
+                width: size,
+                height: size,
+                speed: 4 + Math.random() * 3 + (score * 0.1), // 점수 높아질수록 빨라짐
+                emoji: '✏️'
+            });
+        }
+
+        function resetGame() {
+            player.x = 50;
+            player.y = canvas.height / 2 - 15;
+            teacher.x = canvas.width - 80;
+            teacher.y = canvas.height / 2 - 15;
+            teacher.speed = 2.2;
+            
+            respawnHomework();
+            chalks = [];
+            score = 0;
+            scoreEl.innerText = score;
+            gameOver = false;
+        }
+
+        function respawnHomework() {
+            homework.x = Math.random() * (canvas.width - 80) + 40;
+            homework.y = Math.random() * (canvas.height - 80) + 40;
+        }
+
+        // 충돌 판정 함수
+        function checkCollision(rect1, rect2) {
+            return (
+                rect1.x < rect2.x + rect2.width &&
+                rect1.x + rect1.width > rect2.x &&
+                rect1.y < rect2.y + rect2.height &&
+                rect1.y + rect1.height > rect2.y
+            );
+        }
+
+        // 업데이트 루프
+        function update() {
+            if (gameOver || !gameStart) return;
+
+            // 1. 학생 이동
+            if (keys['ArrowUp'] && player.y > 0) player.y -= player.speed;
+            if (keys['ArrowDown'] && player.y < canvas.height - player.height) player.y += player.speed;
+            if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
+            if (keys['ArrowRight'] && player.x < canvas.width - player.width) player.x += player.speed;
+
+            // 2. 선생님 AI (학생 추적)
+            const dx = player.x - teacher.x;
+            const dy = player.y - teacher.y;
+            const angle = Math.atan2(dy, dx);
+            
+            teacher.x += Math.cos(angle) * teacher.speed;
+            teacher.y += Math.sin(angle) * teacher.speed;
+
+            // 3. 분필 생성 및 이동
+            chalkTimer++;
+            if (chalkTimer % Math.max(20, (60 - Math.floor(score / 2))) === 0) {
+                spawnChalk();
+            }
+
+            for (let i = chalks.length - 1; i >= 0; i--) {
+                chalks[i].x -= chalks[i].speed;
+
+                // 학생이 분필에 맞았는지 검사
+                if (checkCollision(player, chalks[i])) {
+                    endGame();
+                }
+
+                // 화면 밖으로 나간 분필 제거
+                if (chalks[i].x < -20) {
+                    chalks.splice(i, 1);
+                }
+            }
+
+            // 4. 선생님에게 잡혔는지 검사
+            if (checkCollision(player, teacher)) {
+                endGame();
+            }
+
+            // 5. 숙제 획득 검사
+            if (checkCollision(player, homework)) {
+                score += 10;
+                scoreEl.innerText = score;
+                
+                // 최고 점수 갱신
+                if (score > highScore) {
+                    highScore = score;
+                    highScoreEl.innerText = highScore;
+                    localStorage.setItem('teacherGame_highScore', highScore);
+                }
+
+                // 난이도 상승 (선생님 속도 증가)
+                teacher.speed += 0.15;
+
+                respawnHomework();
+            }
+        }
+
+        function endGame() {
+            gameOver = true;
+        }
+
+        // 그리기 루프
+        function draw() {
+            // 배경 청소
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 칠판 느낌의 배경 격자선
+            ctx.strokeStyle = '#3d4d3d';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let j = 0; j < canvas.height; j += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, j);
+                ctx.lineTo(canvas.width, j);
+                ctx.stroke();
+            }
+
+            if (!gameStart) {
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '24px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('아무 방향키나 눌러서 시작하세요!', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            // 이모지 폰트 설정
+            ctx.font = '28px serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+
+            // 숙제 그리기
+            ctx.fillText(homework.emoji, homework.x, homework.y);
+
+            // 분필 그리기
+            chalks.forEach(chalk => {
+                ctx.fillText(chalk.emoji, chalk.x, chalk.y);
+            });
+
+            // 플레이어 그리기
+            ctx.fillText(player.emoji, player.x, player.y);
+
+            // 선생님 그리기
+            ctx.fillText(teacher.emoji, teacher.x, teacher.y);
+
+            // 게임 오버 화면
+            if (gameOver) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#ff4d4d';
+                ctx.font = 'bold 36px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('선생님한테 잡혔다!', canvas.width / 2, canvas.height / 2 - 30);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '20px sans-serif';
+                ctx.fillText(`최종 점수: ${score}점`, canvas.width / 2, canvas.height / 2 + 10);
+                ctx.fillText('재시작하려면 [Space] 키나 [R] 키를 누르세요', canvas.width / 2, canvas.height / 2 + 50);
+            }
+        }
+
+        // 메인 게임 루프
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 게임 시작
+        gameLoop();
+    </script>
+</body>
+</html>
