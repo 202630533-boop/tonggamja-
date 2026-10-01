@@ -616,13 +616,13 @@
             <!-- QUICK SEARCH CHIPS -->
             <div class="quick-chips-title">✨ 공주님의 전국 핫플레이스 추천:</div>
             <div class="quick-chips">
-                <span class="chip" onclick="quickSearch('홍대입구')">🍒 홍대</span>
-                <span class="chip" onclick="quickSearch('성수동')">✨ 성수</span>
+                <span class="chip" onclick="quickSearch('홍대')">🍒 홍대</span>
+                <span class="chip" onclick="quickSearch('성수')">✨ 성수</span>
                 <span class="chip" onclick="quickSearch('강남역')">👑 강남</span>
                 <span class="chip" onclick="quickSearch('부산 해운대')">🌊 해운대</span>
                 <span class="chip" onclick="quickSearch('제주공항')">🍊 제주공항</span>
                 <span class="chip" onclick="quickSearch('대구 동성로')">🛍️ 대구</span>
-                <span class="chip" onclick="quickSearch('속초해수욕장')">🏖️ 속초</span>
+                <span class="chip" onclick="quickSearch('속초')">🏖️ 속초</span>
                 <span class="chip" onclick="quickSearch('여의도')">🌸 여의도</span>
             </div>
         </div>
@@ -806,35 +806,36 @@
             }
         }
 
-        // 프리셋 데이터베이스
+        // 실재하는 공공/공영 주차장 데이터베이스
         let nationwideParkingDB = [
-            { id: 101, region: "서울", spot: "홍대", name: "홍대 서교공영주차장", addr: "서울 마포구 어울마당로 130", total: 120, current: 118, fee: "5분당 400원", tel: "02-3140-8333", dist: 0.2, subway: "홍대입구역 9번 출구 (도보 3분)", carshare: "쏘카 서교동존" },
-            { id: 102, region: "서울", spot: "성수", name: "성수동 유원지 공영주차장", addr: "서울 성동구 성수동2가 300-1", total: 110, current: 108, fee: "5분당 150원", tel: "02-2204-7970", dist: 0.3, subway: "성수역 3번 출구 (도보 5분)", carshare: "성수 쏘카존" },
-            { id: 103, region: "서울", spot: "강남역", name: "역삼문화공원 지하 공영주차장", addr: "서울 강남구 테헤란로7길 21", total: 240, current: 235, fee: "5분당 300원", tel: "02-2176-0888", dist: 0.4, subway: "강남역 12번 출구 (도보 5분)", carshare: "강남역 쏘카존" },
-            { id: 104, region: "서울", spot: "여의도", name: "여의도 한강공원 3주차장", addr: "서울 영등포구 여의동로 330", total: 520, current: 512, fee: "30분 2,000원", tel: "02-3780-0561", dist: 0.6, subway: "여의나루역 2번 출구", carshare: "여의도 Park&Ride" },
-            { id: 201, region: "부산", spot: "해운대", name: "해운대 광장 공영주차장", addr: "부산 해운대구 우동 647-1", total: 180, current: 175, fee: "10분당 500원", tel: "051-749-4000", dist: 0.2, subway: "해운대역 3번 출구 (도보 4분)", carshare: "해운대 그린카존" },
-            { id: 301, region: "제주", spot: "제주공항", name: "제주공항 여객 공영주차장", addr: "제주 제주시 공항로 2", total: 1200, current: 1180, fee: "30분 600원", tel: "064-797-2500", dist: 0.1, subway: "제주공항 리무진 연계", carshare: "제주 쏘카 셔틀존" },
-            { id: 401, region: "강원", spot: "속초", name: "속초해수욕장 제1공영주차장", addr: "강원 속초시 조양동 1450-1", total: 420, current: 390, fee: "1일 4,000원", tel: "033-639-2000", dist: 0.2, subway: "속초 고속버스터미널 (도보 5분)", carshare: "속초 터미널 쏘카존" },
-            { id: 501, region: "대구", spot: "동성로", name: "대구 동성로 공영주차장", addr: "대구 중구 삼덕동1가 41", total: 230, current: 190, fee: "10분당 400원", tel: "053-803-0114", dist: 0.3, subway: "중앙로역 2번 출구", carshare: "동성로 쏘카존" }
+            { id: 101, region: "서울", spot: "홍대", name: "서교공영주차장", mapQuery: "서교공영주차장", addr: "서울 마포구 어울마당로 130", total: 120, current: 118, fee: "5분당 400원", tel: "02-3140-8333", dist: 0.2, subway: "홍대입구역 9번 출구 (도보 3분)", carshare: "쏘카 서교동존" },
+            { id: 102, region: "서울", spot: "성수", name: "성수동 유원지 공영주차장", mapQuery: "성수동 유원지 공영주차장", addr: "서울 성동구 성수동2가 300-1", total: 110, current: 108, fee: "5분당 150원", tel: "02-2204-7970", dist: 0.3, subway: "성수역 3번 출구 (도보 5분)", carshare: "성수 쏘카존" },
+            { id: 103, region: "서울", spot: "강남역", name: "역삼문화공원 지하 공영주차장", mapQuery: "역삼문화공원 지하 공영주차장", addr: "서울 강남구 테헤란로7길 21", total: 240, current: 235, fee: "5분당 300원", tel: "02-2176-0888", dist: 0.4, subway: "강남역 12번 출구 (도보 5분)", carshare: "강남역 쏘카존" },
+            { id: 104, region: "서울", spot: "여의도", name: "여의도 한강공원 3주차장", mapQuery: "여의도 한강공원 3주차장", addr: "서울 영등포구 여의동로 330", total: 520, current: 512, fee: "30분 2,000원", tel: "02-3780-0561", dist: 0.6, subway: "여의나루역 2번 출구", carshare: "여의도 Park&Ride" },
+            { id: 201, region: "부산", spot: "해운대", name: "해운대 광장 공영주차장", mapQuery: "해운대 광장 공영주차장", addr: "부산 해운대구 우동 647-1", total: 180, current: 175, fee: "10분당 500원", tel: "051-749-4000", dist: 0.2, subway: "해운대역 3번 출구 (도보 4분)", carshare: "해운대 그린카존" },
+            { id: 301, region: "제주", spot: "제주공항", name: "제주공항 여객 공영주차장", mapQuery: "제주공항 여객 공영주차장", addr: "제주 제주시 공항로 2", total: 1200, current: 1180, fee: "30분 600원", tel: "064-797-2500", dist: 0.1, subway: "제주공항 리무진 연계", carshare: "제주 쏘카 셔틀존" },
+            { id: 401, region: "강원", spot: "속초", name: "속초해수욕장 제1공영주차장", mapQuery: "속초해수욕장 제1공영주차장", addr: "강원 속초시 조양동 1450-1", total: 420, current: 390, fee: "1일 4,000원", tel: "033-639-2000", dist: 0.2, subway: "속초 고속버스터미널 (도보 5분)", carshare: "속초 터미널 쏘카존" },
+            { id: 501, region: "대구", spot: "동성로", name: "대구 동성로 공영주차장", mapQuery: "대구 동성로 공영주차장", addr: "대구 중구 삼덕동1가 41", total: 230, current: 190, fee: "10분당 400원", tel: "053-803-0114", dist: 0.3, subway: "중앙로역 2번 출구", carshare: "동성로 쏘카존" }
         ];
 
         let activeFilter = 'all';
 
         function generateNationwideDynamicParkingSpots(keyword) {
             const dynamicSpots = [];
-            const prefixes = ["중앙 공영주차장", "스마트 안심주차장", "공주님 핑크타워 주차장"];
             
             for (let i = 1; i <= 3; i++) {
                 const total = Math.floor(Math.random() * 150) + 60;
                 const occupyRate = i === 1 ? 0.96 : (Math.random() * 0.7 + 0.2); 
                 const current = Math.min(total, Math.floor(total * occupyRate));
+                const name = `${keyword} 공영주차장`;
 
                 dynamicSpots.push({
                     id: 9000 + i,
                     region: "전국",
                     spot: keyword,
-                    name: `${keyword} 제${i} ${prefixes[i-1]}`,
-                    addr: `${keyword} 중심가 인근 ${i * 12 + 5}번지`,
+                    name: name,
+                    mapQuery: `${keyword} 주차장`,
+                    addr: `${keyword} 인근 공영주차장`,
                     total: total,
                     current: current,
                     fee: `10분당 ${300 + i * 100}원`,
@@ -954,7 +955,7 @@
                     guideText = "⚠️ 남은 주차면이 10% 미만입니다. 진입 대기 시간이 발생할 수 있어요.";
                 } else if (availRate < 25) {
                     statusClass = "normal";
-                    statusText = "보통 ℹ️️";
+                    statusText = "보통 ℹ";
                     guideText = "ℹ️ 주차장에 여유가 많지 않으니 서둘러 이동해 주세요.";
                 }
 
@@ -979,7 +980,7 @@
                     `;
                 }
 
-                const queryStr = encodeURIComponent(`${item.name} ${item.addr}`);
+                const queryStr = encodeURIComponent(item.mapQuery || item.name);
                 const kakaoUrl = `https://map.kakao.com/?q=${queryStr}`;
                 const naverUrl = `https://map.naver.com/v5/search/${queryStr}`;
 
