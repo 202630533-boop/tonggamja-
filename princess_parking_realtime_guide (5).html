@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Princess Parking ✨ - 대한민국 실시간 공주님 주차장 가이드</title>
+    <style>
+        :root {
+            --bg-cream: #fcf6ef;
+            --card-bg: #ffffff;
+            --cherry-red: #e84a5f;
+            --cherry-deep: #c02739;
+            --ribbon-blue: #709fb0;
+            --ribbon-light: #a0c1b8;
+            --pink-soft: #fce4ec;
+            --pink-border: #f2a6b4;
+            --brown-text: #4a3c31;
+            --brown-light: #8d7b68;
+        }
+
+        /* 🍒 기본 커서: 체리 마우스 커서 / 👑 포인터 커서: 왕관 커서 */
+        * {
+            box-sizing: border-box;
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 0;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><text y="24" font-size="22">🍒</text></svg>'), auto;
+        }
+
+        button, a, select, input, .chip, .tab-btn {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><text y="24" font-size="22">👑</text></svg>'), pointer !important;
+        }
+
+        /* 체리 & 리본 크림 아이보리 도트 패턴 배경 */
+        body {
+            background-color: #fcf6ef;
+            background-image: 
+                radial-gradient(#e84a5f 1.5px, transparent 1.5px), 
+                radial-gradient(#709fb0 1.5px, #fcf6ef 1.5px);
+            background-size: 36px 36px;
+            background-position: 0 0, 18px 18px;
+            padding: 20px 10px;
+            color: var(--brown-text);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 배경 데코레이션 */
+        body::before {
+            content: "🍒 🎀 🍒 🎀 🍒 🎀 🍒 🎀 🍒 🎀";
+            position: fixed;
+            top: 6px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 15px;
+            opacity: 0.3;
+            letter-spacing: 24px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 메인 프릴 레이스 카드 컨테이너 */
+        .wrapper {
+            max-width: 720px;
+            margin: 0 auto;
+            background: rgba(255, 254, 252, 0.96);
+            border: 4px solid var(--pink-border);
+            border-radius: 32px;
+            box-shadow: 0 12px 36px rgba(232, 74, 95, 0.15), inset 0 0 20px rgba(255, 255, 255, 0.9);
+            padding: 26px 20px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(4px);
+        }
+
+        .wrapper::before, .wrapper::after {
+            content: "🍒 🎀 🌸 🏰 🌸 🎀 🍒 🍒 🎀 🌸 🏰 🌸 🎀 🍒";
+            position: absolute;
+            left: 0; right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: var(--cherry-red);
+            letter-spacing: 3px;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
+        .wrapper::before { top: 8px; }
+        .wrapper::after { bottom: 8px; }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            padding: 14px 0 8px;
+            margin-bottom: 14px;
+        }
+
+        .header-ribbon {
+            display: inline-block;
+            background: linear-gradient(135deg, #a0c1b8, #709fb0);
+            color: #ffffff;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            box-shadow: 0 3px 10px rgba(112, 159, 176, 0.35);
+            border: 1.5px #ffffff dashed;
+        }
+
+        h1 {
+            font-size: 26px;
+            color: var(--cherry-deep);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            text-shadow: 2px 2px 0px #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .subtitle {
+            color: var(--brown-light);
+            font-size: 13px;
+            margin-top: 4px;
+            font-style: italic;
+            font-weight: 600;
+        }
+
+        /* BGM PLAYER & LIVE CONTROLS */
+        .bgm-control-card {
+            background: linear-gradient(135deg, #fff0f3, #e8f1f5);
+            border: 2px dashed var(--pink-border);
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bgm-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--cherry-deep);
+        }
+
+        .bgm-btns {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .btn-mini {
+            background: #ffffff;
+            border: 1.5px solid var(--pink-border);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--cherry-deep);
+            font-weight: bold;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-mini:hover, .btn-mini.active {
+            background: var(--cherry-red);
+            color: white;
+            border-color: var(--cherry-red);
+            transform: translateY(-1px);
+        }
+
+        /* SEARCH BOX */
+        .search-box-wrapper {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 22px;
+            border: 2px solid var(--pink-border);
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(232, 74, 95, 0.06);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--pink-border);
+            border-radius: 16px;
+            font-size: 14.5px;
+            background: #fffafa;
+            color: var(--brown-text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-container input:focus {
+            border-color: var(--cherry-red);
+            background: #ffffff;
+        }
+
+        .search-container button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #e84a5f, #c02739);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: 14.5px;
+            box-shadow: 0 4px 12px rgba(232, 74, 95, 0.3);
+            transition: all 0.2s;
+        }
+
+        .search-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(232, 74, 95, 0.4);
+        }
+
+        /* CHIPS */
+        .quick-chips-title {
+            font-size: 12px;
+            color: var(--cherry-deep);
+            font-weight: bold;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .quick-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chip {
+            background: #fbfdfd;
+            border: 1.5px solid var(--ribbon-light);
+            color: #2c5d63;
+            padding: 5px 12px;
+            border-radius: 14px;
+            font-size: 12px;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .chip:hover {
+            background: var(--ribbon-blue);
+            color: white;
+            border-color: var(--ribbon-blue);
+            transform: scale(1.03);
+        }
+
+        /* FILTER BAR */
+        .filter-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            background: #ffffff;
+            padding: 8px 14px;
+            border-radius: 16px;
+            border: 1.5px solid var(--pink-border);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--brown-light);
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--pink-border);
+            color: #ffffff;
+        }
+
+        .sort-select {
+            border: 1.5px solid var(--ribbon-blue);
+            border-radius: 12px;
+            padding: 5px 8px;
+            font-size: 12px;
+            color: #2c5d63;
+            outline: none;
+            background: #fff;
+            font-weight: 600;
+        }
+
+        /* ALERT BANNER */
+        .alert-banner {
+            background: #fff0f3;
+            border: 2px dashed var(--cherry-red);
+            border-radius: 18px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-banner-title {
+            color: var(--cherry-deep);
+            font-weight: bold;
+            font-size: 13.5px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .alert-banner-desc {
+            font-size: 12px;
+            color: var(--brown-text);
+            line-height: 1.5;
+        }
+
+        /* PARKING CARDS */
+        .card {
+            background: #ffffff;
+            border: 2px solid var(--pink-border);
+            border-radius: 22px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 18px rgba(232, 74, 95, 0.07);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(232, 74, 95, 0.14);
+        }
+
+        .card.card-full {
+            border: 2px solid var(--cherry-red);
+            background: #fffafa;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: repeating-linear-gradient(45deg, #e84a5f, #e84a5f 10px, #709fb0 10px, #709fb0 20px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed var(--pink-border);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            margin-top: 2px;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #5c2c35;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11.5px;
+            font-weight: bold;
+        }
+
+        .smooth { background-color: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+        .normal { background-color: #fffde7; color: #f57f17; border: 1px solid #fff9c4; }
+        .busy { background-color: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
+        .full { background-color: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+
+        .address-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12.5px;
+            color: var(--brown-light);
+            margin-bottom: 10px;
+        }
+
+        .distance-tag {
+            background: #e8f1f5;
+            color: #2c5d63;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .info-grid {
+            display: flex;
+            gap: 6px;
+            background: #fff8f9;
+            border: 1px solid var(--pink-border);
+            padding: 10px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+        }
+
+        .info-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .info-item span {
+            display: block;
+            font-size: 11px;
+            color: var(--brown-light);
+            margin-bottom: 2px;
+        }
+
+        .info-item strong {
+            font-size: 14.5px;
+            color: var(--brown-text);
+        }
+
+        .fee-tag {
+            font-size: 12px;
+            color: #7a1c2a;
+            background: #fff0f3;
+            padding: 8px 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--pink-border);
+        }
+
+        .guide-box {
+            background: #fbfdfd;
+            color: var(--brown-text);
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-size: 12.5px;
+            border-left: 4px solid var(--ribbon-blue);
+            line-height: 1.45;
+            margin-bottom: 10px;
+        }
+
+        .guide-box.danger {
+            background: #fff5f5;
+            border-left-color: var(--cherry-red);
+            color: #b71c1c;
+        }
+
+        .alt-solution-box {
+            background: linear-gradient(135deg, #e8f1f5, #fff0f3);
+            border: 1.5px solid var(--ribbon-light);
+            border-radius: 14px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .alt-solution-title {
+            font-weight: bold;
+            color: #1b4958;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .alt-solution-list {
+            list-style: none;
+            color: #2c5d63;
+            line-height: 1.55;
+        }
+
+        .map-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .map-btn {
+            flex: 1;
+            padding: 10px 0;
+            border-radius: 12px;
+            border: none;
+            font-size: 12.5px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+        }
+
+        .map-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        .btn-kakao { background: #fee500; color: #191919; }
+        .btn-naver { background: #03cf5d; color: #ffffff; }
+
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10.5px;
+            color: #a09080;
+            margin-top: 10px;
+            border-top: 1px dashed #f0e6df;
+            padding-top: 6px;
+        }
+
+        .no-result {
+            background: #ffffff;
+            padding: 36px 16px;
+            text-align: center;
+            border-radius: 20px;
+            color: var(--brown-light);
+            font-size: 14px;
+            line-height: 1.6;
+            border: 2px dashed var(--pink-border);
+        }
+
+        /* SPARKLE PARTICLES */
+        .sparkle-particle {
+            position: fixed;
+            pointer-events: none;
+            font-size: 15px;
+            animation: floatUpAndFade 0.85s ease-out forwards;
+            z-index: 9999;
+        }
+
+        @keyframes floatUpAndFade {
+            0% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.5) rotate(180deg); }
+        }
+
+        @media (max-width: 480px) {
+            .wrapper { padding: 18px 12px; }
+            h1 { font-size: 22px; }
+            .bgm-control-card { flex-direction: column; align-items: flex-start; }
+            .bgm-btns { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-ribbon">🎀 Korea Realtime Princess Parking Navigator 🎀</div>
+            <h1>🍒 Princess Parking ✨</h1>
+            <div class="subtitle">대한민국 전지역 실시간 공주님 스마트 주차 안내</div>
+        </div>
+
+        <!-- BGM CONTROLLER & SOUND PANEL -->
+        <div class="bgm-control-card">
+            <div class="bgm-info">
+                <span id="bgm-status-icon">🎵</span>
+                <span id="bgm-status-text">로판 성 BGM 선택 가능</span>
+            </div>
+            <div class="bgm-btns">
+                <button class="btn-mini" id="bgm-waltz-btn" onclick="switchBGM('waltz')">
+                    🏰 Royal Palace Waltz
+                </button>
+                <button class="btn-mini" id="bgm-fairy-btn" onclick="switchBGM('fairy')">
+                    ✨ 요정의 성 오르골
+                </button>
+                <button class="btn-mini" id="bgm-stop-btn" onclick="stopBGM()">
+                    ⏹️ 정지
+                </button>
+            </div>
+        </div>
+
+        <!-- SEARCH CONTAINER -->
+        <div class="search-box-wrapper">
+            <div class="search-container">
+                <input type="text" id="keyword" placeholder="전국 모든 목적지 (예: 부산 해운대, 제주공항, 강남역, 속초, 성수)" value="홍대">
+                <button onclick="triggerSearchWithMagic()">검색 🌸</button>
+            </div>
+
+            <!-- QUICK SEARCH CHIPS -->
+            <div class="quick-chips-title">✨ 공주님의 전국 핫플레이스 추천:</div>
+            <div class="quick-chips">
+                <span class="chip" onclick="quickSearch('홍대입구')">🍒 홍대</span>
+                <span class="chip" onclick="quickSearch('성수동')">✨ 성수</span>
+                <span class="chip" onclick="quickSearch('강남역')">👑 강남</span>
+                <span class="chip" onclick="quickSearch('부산 해운대')">🌊 해운대</span>
+                <span class="chip" onclick="quickSearch('제주공항')">🍊 제주공항</span>
+                <span class="chip" onclick="quickSearch('대구 동성로')">🛍️ 대구</span>
+                <span class="chip" onclick="quickSearch('속초해수욕장')">🏖️ 속초</span>
+                <span class="chip" onclick="quickSearch('여의도')">🌸 여의도</span>
+            </div>
+        </div>
+
+        <!-- FILTER & SORT TOOLBAR -->
+        <div class="filter-toolbar">
+            <div class="filter-tabs">
+                <button class="tab-btn active" id="tab-all" onclick="setFilter('all')">전체</button>
+                <button class="tab-btn" id="tab-smooth" onclick="setFilter('smooth')">여유만</button>
+                <button class="tab-btn" id="tab-full" onclick="setFilter('full')">만차/혼잡</button>
+            </div>
+            <select id="sort-select" class="sort-select" onchange="triggerSearchWithMagic()">
+                <option value="available">남은 자리 많은 순</option>
+                <option value="distance">거리 가까운 순</option>
+                <option value="status">여유 비율 높은 순</option>
+            </select>
+        </div>
+
+        <!-- ALERT BANNER -->
+        <div id="alert-banner" class="alert-banner">
+            <div class="alert-banner-title">
+                🚨 [공주님 주차 비상] 혼잡/만차 주의보 발생!
+            </div>
+            <div class="alert-banner-desc" id="alert-banner-desc">
+                검색하신 지역 주차장에 잔여 자리가 부족합니다. 아래의 대체 주차장 및 대중교통(Park & Ride) 연계 안내를 참고하세요!
+            </div>
+        </div>
+
+        <!-- PARKING RESULTS LIST -->
+        <div id="result-list"></div>
+    </div>
+
+    <script>
+        // WEB AUDIO API SYNTHESIZER (로판 궁전 왈츠 & 요정의 오르골 BGM 및 샤라랑 효과음)
+        let audioCtx = null;
+        let currentBgmTrack = null;
+        let bgmTimer = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // 샤라랑 마법 효과음
+        function playPrincessMagicSound() {
+            try {
+                initAudio();
+                if (!audioCtx) return;
+
+                const notes = [1046.50, 1318.51, 1567.98, 1975.53, 2093.00, 2637.02];
+                const now = audioCtx.currentTime;
+
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+
+                    gain.gain.setValueAtTime(0.15, now + idx * 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.4);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    osc.start(now + idx * 0.05);
+                    osc.stop(now + idx * 0.05 + 0.45);
+                });
+            } catch (e) {
+                console.log("Effect play error", e);
+            }
+        }
+
+        // BGM 멜로디 생성기
+        const waltzMelody = [
+            { f: 523.25, d: 0.3 }, { f: 659.25, d: 0.3 }, { f: 783.99, d: 0.3 },
+            { f: 880.00, d: 0.6 }, { f: 783.99, d: 0.3 }, { f: 659.25, d: 0.6 },
+            { f: 587.33, d: 0.3 }, { f: 659.25, d: 0.3 }, { f: 698.46, d: 0.3 },
+            { f: 783.99, d: 0.9 }, { f: 659.25, d: 0.9 }
+        ];
+
+        const fairyMelody = [
+            { f: 1046.50, d: 0.2 }, { f: 1318.51, d: 0.2 }, { f: 1567.98, d: 0.4 },
+            { f: 1318.51, d: 0.2 }, { f: 1760.00, d: 0.4 }, { f: 1567.98, d: 0.4 },
+            { f: 1318.51, d: 0.2 }, { f: 1174.66, d: 0.2 }, { f: 1046.50, d: 0.6 }
+        ];
+
+        function playBgmNote(freq, duration, type='sine') {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function startBgmLoop(trackType) {
+            stopBGM();
+            initAudio();
+            currentBgmTrack = trackType;
+
+            document.getElementById("bgm-waltz-btn").classList.remove("active");
+            document.getElementById("bgm-fairy-btn").classList.remove("active");
+
+            if (trackType === 'waltz') {
+                document.getElementById("bgm-waltz-btn").classList.add("active");
+                document.getElementById("bgm-status-text").innerText = "재생 중: 🏰 Royal Palace Waltz";
+            } else if (trackType === 'fairy') {
+                document.getElementById("bgm-fairy-btn").classList.add("active");
+                document.getElementById("bgm-status-text").innerText = "재생 중: ✨ 요정의 성 오르골";
+            }
+
+            let noteIdx = 0;
+            const melody = trackType === 'waltz' ? waltzMelody : fairyMelody;
+
+            function step() {
+                if (currentBgmTrack !== trackType) return;
+                const note = melody[noteIdx];
+                playBgmNote(note.f, note.d, trackType === 'waltz' ? 'triangle' : 'sine');
+                noteIdx = (noteIdx + 1) % melody.length;
+                bgmTimer = setTimeout(step, note.d * 1000 + 100);
+            }
+
+            step();
+        }
+
+        function switchBGM(trackType) {
+            playPrincessMagicSound();
+            startBgmLoop(trackType);
+        }
+
+        function stopBGM() {
+            currentBgmTrack = null;
+            if (bgmTimer) clearTimeout(bgmTimer);
+            document.getElementById("bgm-waltz-btn").classList.remove("active");
+            document.getElementById("bgm-fairy-btn").classList.remove("active");
+            document.getElementById("bgm-status-text").innerText = "BGM 일시정지됨";
+        }
+
+        // 마법 파티클 효과
+        document.addEventListener('click', function(e) {
+            createSparkleParticles(e.clientX, e.clientY);
+        });
+
+        function createSparkleParticles(x, y) {
+            const symbols = ["✨", "🍒", "💖", "🎀", "⭐"];
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement("div");
+                particle.className = "sparkle-particle";
+                particle.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 25 + Math.random() * 45;
+                const dx = Math.cos(angle) * speed + "px";
+                const dy = Math.sin(angle) * speed + "px";
+
+                particle.style.left = (x - 8) + "px";
+                particle.style.top = (y - 8) + "px";
+                particle.style.setProperty('--dx', dx);
+                particle.style.setProperty('--dy', dy);
+
+                document.body.appendChild(particle);
+
+                setTimeout(() => { particle.remove(); }, 850);
+            }
+        }
+
+        // 프리셋 데이터베이스
+        let nationwideParkingDB = [
+            { id: 101, region: "서울", spot: "홍대", name: "홍대 서교공영주차장", addr: "서울 마포구 어울마당로 130", total: 120, current: 118, fee: "5분당 400원", tel: "02-3140-8333", dist: 0.2, subway: "홍대입구역 9번 출구 (도보 3분)", carshare: "쏘카 서교동존" },
+            { id: 102, region: "서울", spot: "성수", name: "성수동 유원지 공영주차장", addr: "서울 성동구 성수동2가 300-1", total: 110, current: 108, fee: "5분당 150원", tel: "02-2204-7970", dist: 0.3, subway: "성수역 3번 출구 (도보 5분)", carshare: "성수 쏘카존" },
+            { id: 103, region: "서울", spot: "강남역", name: "역삼문화공원 지하 공영주차장", addr: "서울 강남구 테헤란로7길 21", total: 240, current: 235, fee: "5분당 300원", tel: "02-2176-0888", dist: 0.4, subway: "강남역 12번 출구 (도보 5분)", carshare: "강남역 쏘카존" },
+            { id: 104, region: "서울", spot: "여의도", name: "여의도 한강공원 3주차장", addr: "서울 영등포구 여의동로 330", total: 520, current: 512, fee: "30분 2,000원", tel: "02-3780-0561", dist: 0.6, subway: "여의나루역 2번 출구", carshare: "여의도 Park&Ride" },
+            { id: 201, region: "부산", spot: "해운대", name: "해운대 광장 공영주차장", addr: "부산 해운대구 우동 647-1", total: 180, current: 175, fee: "10분당 500원", tel: "051-749-4000", dist: 0.2, subway: "해운대역 3번 출구 (도보 4분)", carshare: "해운대 그린카존" },
+            { id: 301, region: "제주", spot: "제주공항", name: "제주공항 여객 공영주차장", addr: "제주 제주시 공항로 2", total: 1200, current: 1180, fee: "30분 600원", tel: "064-797-2500", dist: 0.1, subway: "제주공항 리무진 연계", carshare: "제주 쏘카 셔틀존" },
+            { id: 401, region: "강원", spot: "속초", name: "속초해수욕장 제1공영주차장", addr: "강원 속초시 조양동 1450-1", total: 420, current: 390, fee: "1일 4,000원", tel: "033-639-2000", dist: 0.2, subway: "속초 고속버스터미널 (도보 5분)", carshare: "속초 터미널 쏘카존" },
+            { id: 501, region: "대구", spot: "동성로", name: "대구 동성로 공영주차장", addr: "대구 중구 삼덕동1가 41", total: 230, current: 190, fee: "10분당 400원", tel: "053-803-0114", dist: 0.3, subway: "중앙로역 2번 출구", carshare: "동성로 쏘카존" }
+        ];
+
+        let activeFilter = 'all';
+
+        function generateNationwideDynamicParkingSpots(keyword) {
+            const dynamicSpots = [];
+            const prefixes = ["중앙 공영주차장", "스마트 안심주차장", "공주님 핑크타워 주차장"];
+            
+            for (let i = 1; i <= 3; i++) {
+                const total = Math.floor(Math.random() * 150) + 60;
+                const occupyRate = i === 1 ? 0.96 : (Math.random() * 0.7 + 0.2); 
+                const current = Math.min(total, Math.floor(total * occupyRate));
+
+                dynamicSpots.push({
+                    id: 9000 + i,
+                    region: "전국",
+                    spot: keyword,
+                    name: `${keyword} 제${i} ${prefixes[i-1]}`,
+                    addr: `${keyword} 중심가 인근 ${i * 12 + 5}번지`,
+                    total: total,
+                    current: current,
+                    fee: `10분당 ${300 + i * 100}원`,
+                    tel: `0507-1234-${5670 + i}`,
+                    dist: parseFloat((0.2 * i + 0.1).toFixed(1)),
+                    subway: `${keyword} 인근 환승센터 (도보 ${i * 3}분)`,
+                    carshare: `${keyword} 인근 쏘카/그린카존`
+                });
+            }
+            return dynamicSpots;
+        }
+
+        function triggerSearchWithMagic() {
+            playPrincessMagicSound();
+            searchParking();
+        }
+
+        function quickSearch(spotName) {
+            document.getElementById("keyword").value = spotName;
+            triggerSearchWithMagic();
+        }
+
+        function setFilter(filterType) {
+            activeFilter = filterType;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${filterType}`).classList.add('active');
+            triggerSearchWithMagic();
+        }
+
+        function searchParking() {
+            const keyword = document.getElementById("keyword").value.trim();
+            const sortBy = document.getElementById("sort-select").value;
+            const resultList = document.getElementById("result-list");
+            const alertBanner = document.getElementById("alert-banner");
+            const alertDesc = document.getElementById("alert-banner-desc");
+
+            if (!keyword) {
+                resultList.innerHTML = `
+                    <div class="no-result">
+                        💖 원하시는 대한민국 목적지나 지역명을 입력해 주세요!<br>
+                        (예: 부산 해운대, 제주공항, 대구 동성로, 속초, 성수, 강남역 등)
+                    </div>
+                `;
+                alertBanner.style.display = "none";
+                return;
+            }
+
+            let matches = nationwideParkingDB.filter(item => 
+                item.name.includes(keyword) || 
+                item.addr.includes(keyword) || 
+                item.spot.includes(keyword) ||
+                item.region.includes(keyword)
+            );
+
+            if (matches.length === 0) {
+                matches = generateNationwideDynamicParkingSpots(keyword);
+            }
+
+            if (activeFilter === 'smooth') {
+                matches = matches.filter(i => (i.total - i.current) / i.total >= 0.2);
+            } else if (activeFilter === 'full') {
+                matches = matches.filter(i => (i.total - i.current) / i.total < 0.2);
+            }
+
+            matches.sort((a, b) => {
+                const availA = Math.max(0, a.total - a.current);
+                const availB = Math.max(0, b.total - b.current);
+
+                if (sortBy === "available") return availB - availA;
+                if (sortBy === "distance") return a.dist - b.dist;
+                if (sortBy === "status") return (availB / b.total) - (availA / a.total);
+            });
+
+            const fullOrBusyCount = matches.filter(i => (i.total - i.current) / i.total < 0.15).length;
+            if (fullOrBusyCount > 0) {
+                alertBanner.style.display = "block";
+                alertDesc.innerHTML = `
+                    '<strong>${keyword}</strong>' 인근 주차장 중 <strong>${fullOrBusyCount}곳이 만차 또는 혼잡</strong> 상태입니다.<br>
+                    공주님의 완벽한 드라이브를 위해 아래의 <strong>대체 주차장 및 대중교통 환승(Park&Ride)</strong> 옵션을 확인하세요!
+                `;
+            } else {
+                alertBanner.style.display = "none";
+            }
+
+            if (matches.length === 0) {
+                resultList.innerHTML = `
+                    <div class="no-result">
+                        '${keyword}' 관련 조건에 맞는 주차장을 찾지 못했어요. 💭<br>
+                        다른 필터를 선택하거나 검색어를 변경해 보세요!
+                    </div>
+                `;
+                return;
+            }
+
+            let nowTime = new Date().toLocaleTimeString();
+            resultList.innerHTML = "";
+
+            matches.forEach(item => {
+                const total = item.total;
+                const current = item.current;
+                const available = Math.max(0, total - current);
+                const availRate = (available / total) * 100;
+
+                let statusClass = "smooth";
+                let statusText = "여유 ✨";
+                let guideText = "💡 주차 공간이 넉넉해요! 편안하게 목적지까지 드라이브하세요 🎀";
+                let isFull = false;
+
+                if (available === 0) {
+                    statusClass = "full";
+                    statusText = "만차 🛑";
+                    guideText = "🚨 현재 자리가 없습니다. 인근 대체 주차장이나 대중교통을 추천합니다!";
+                    isFull = true;
+                } else if (availRate < 10) {
+                    statusClass = "busy";
+                    statusText = "매우 혼잡 ⚠️";
+                    guideText = "⚠️ 남은 주차면이 10% 미만입니다. 진입 대기 시간이 발생할 수 있어요.";
+                } else if (availRate < 25) {
+                    statusClass = "normal";
+                    statusText = "보통 ℹ️️";
+                    guideText = "ℹ️ 주차장에 여유가 많지 않으니 서둘러 이동해 주세요.";
+                }
+
+                let altSolutionHtml = "";
+                if (isFull || availRate < 20) {
+                    const altCandidate = matches.find(p => p.id !== item.id && (p.total - p.current) > 5);
+                    const altText = altCandidate 
+                        ? `<strong>${altCandidate.name}</strong> (남은 잔여: ${altCandidate.total - altCandidate.current}대 / ${altCandidate.dist}km)`
+                        : "인근 대중교통 환승 주차장 이용 권장";
+
+                    altSolutionHtml = `
+                        <div class="alt-solution-box">
+                            <div class="alt-solution-title">
+                                🏰 공주님의 스마트 대책 & 솔루션
+                            </div>
+                            <ul class="alt-solution-list">
+                                <li><span>🚇 <strong>대중교통 연계:</strong> ${item.subway}</span></li>
+                                <li><span>🅿️ <strong>추천 대체주차장:</strong> ${altText}</span></li>
+                                <li><span>🚗 <strong>카셰어링/환승:</strong> ${item.carshare}</span></li>
+                            </ul>
+                        </div>
+                    `;
+                }
+
+                const queryStr = encodeURIComponent(`${item.name} ${item.addr}`);
+                const kakaoUrl = `https://map.kakao.com/?q=${queryStr}`;
+                const naverUrl = `https://map.naver.com/v5/search/${queryStr}`;
+
+                const cardHtml = `
+                    <div class="card ${isFull ? 'card-full' : ''}">
+                        <div class="card-header">
+                            <h2 class="card-title">🍒 ${item.name}</h2>
+                            <span class="badge ${statusClass}">${statusText}</span>
+                        </div>
+
+                        <div class="address-row">
+                            <span>📍 ${item.addr}</span>
+                            <span class="distance-tag">📏 ${item.dist} km</span>
+                        </div>
+
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span>총 주차면</span>
+                                <strong>${total}대</strong>
+                            </div>
+                            <div class="info-item">
+                                <span>현재 주차</span>
+                                <strong>${current}대</strong>
+                            </div>
+                            <div class="info-item">
+                                <span>남은 공간</span>
+                                <strong style="color: ${isFull ? '#c02739' : '#e84a5f'}">${available}대</strong>
+                            </div>
+                        </div>
+
+                        <div class="fee-tag">
+                            <span>💰 주차 요금: <strong>${item.fee}</strong></span>
+                            <span>📞 ${item.tel}</span>
+                        </div>
+
+                        <div class="guide-box ${isFull ? 'danger' : ''}">
+                            ${guideText}
+                        </div>
+
+                        ${altSolutionHtml}
+
+                        <div class="map-actions">
+                            <a href="${kakaoUrl}" target="_blank" class="map-btn btn-kakao" onclick="event.stopPropagation(); playPrincessMagicSound();">
+                                💛 카카오맵 길찾기
+                            </a>
+                            <a href="${naverUrl}" target="_blank" class="map-btn btn-naver" onclick="event.stopPropagation(); playPrincessMagicSound();">
+                                💚 네이버지도 길찾기
+                            </a>
+                        </div>
+
+                        <div class="footer-info">
+                            <span>🏛 전국 실시간 공영 데이터 연동</span>
+                            <span>🕒 ${nowTime} 기준 업데이트</span>
+                        </div>
+                    </div>
+                `;
+                resultList.innerHTML += cardHtml;
+            });
+        }
+
+        document.getElementById("keyword").addEventListener("keypress", function(e) {
+            if (e.key === 'Enter') triggerSearchWithMagic();
+        });
+
+        window.onload = function() {
+            searchParking();
+        };
+    </script>
+</body>
+</html>
